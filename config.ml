@@ -23,16 +23,6 @@ let tls_key =
   in
   Key.(create "tls" Arg.(opt ~stage:`Configure bool false doc))
 
-let redirect_key =
-  let doc = Key.Arg.info
-      ~doc:"Where to redirect to. Must start with http:// or https://. \
-            When tls is enabled, the default is https://$HOST, with the effect that all http requests will be redirected to https"
-      ~docv:"URL" ~env:"REDIRECT" ["redirect"]
-  in
-  Key.(create "redirect" Arg.(opt (some string) None doc))
-
-let keys = Key.([ abstract redirect_key ])
-
 let fs_key = Key.(value @@ kv_ro ())
 let filesfs = generic_kv_ro ~key:fs_key "files"
 let tmplfs = generic_kv_ro ~key:fs_key "tmpl"
@@ -42,13 +32,13 @@ let secrets = generic_kv_ro ~key:secrets_key "tls"
 let stack = generic_stackv4 tap0
 
 let http =
-  foreign ~keys "Dispatch.Make"
+  foreign  "Dispatch.Make"
     (http @-> console @-> kv_ro @-> kv_ro @-> pclock @-> job)
 
 let https =
   let libraries = [ "tls"; "tls.mirage"; "mirage-http" ] in
   let packages = ["tls"; "tls"; "mirage-http"] in
-  foreign ~libraries ~packages  ~keys "Dispatch_tls.Make"
+  foreign ~libraries ~packages  "Dispatch_tls.Make"
     ~deps:[abstract nocrypto]
     (stackv4 @-> kv_ro @-> console @-> kv_ro @-> kv_ro @-> pclock @-> job)
 
