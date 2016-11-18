@@ -33,12 +33,12 @@ let stack = generic_stackv4 tap0
 
 let http =
   foreign  "Dispatch.Make"
-    (http @-> console @-> kv_ro @-> kv_ro @-> pclock @-> job)
+    (http @-> console @-> kv_ro @-> kv_ro @-> job)
 
 let https =
   foreign "Dispatch_tls.Make"
     ~deps:[abstract nocrypto]
-    (stackv4 @-> kv_ro @-> console @-> kv_ro @-> kv_ro @-> pclock @-> job)
+    (stackv4 @-> kv_ro @-> console @-> kv_ro @-> kv_ro @-> job)
 
 
 let dispatch = if_impl (Key.value tls_key)
@@ -52,5 +52,5 @@ let () =
   let tracing = None in
   (* let tracing = mprof_trace ~size:10000 () in *)
   register ?tracing "minimized_www" [
-    dispatch $ default_console $ filesfs $ tmplfs $ default_posix_clock
+    dispatch $ default_console $ filesfs $ tmplfs
   ]
