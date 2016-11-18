@@ -27,24 +27,23 @@ let fs_key = Key.(value @@ kv_ro ())
 
 let secrets_key = Key.(value @@ kv_ro ~group:"secrets" ())
 let secrets = generic_kv_ro ~key:secrets_key "tls"
-let stack = generic_stackv4 tap0
 
 let http =
   foreign  "Dispatch.Make"
-    (http @-> console @-> job)
+    (console @-> job)
 
 let https =
   foreign "Dispatch_tls.Make"
     ~deps:[abstract nocrypto]
-    (stackv4 @-> kv_ro @-> console @-> job)
+    (kv_ro @-> console @-> job)
 
 
 let dispatch = if_impl (Key.value tls_key)
     (** With tls *)
-    (https $ stack $ secrets)
+    (https $ secrets)
 
     (** Without tls *)
-    (http  $ http_server (conduit_direct stack))
+    (http)
 
 let () =
   let tracing = None in
