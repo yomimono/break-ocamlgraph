@@ -1,7 +1,7 @@
-module Make (S : V1_LWT.STACKV4)
+module Make
             (C: V1_LWT.CONSOLE) 
             = struct
-  let main _stack console  =
+  let main console  =
     C.log console "booted up dispatch" >>= fun () ->
     Lwt.return_unit
 end
